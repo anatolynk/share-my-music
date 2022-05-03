@@ -4,7 +4,7 @@ import React from "react";
 
 function Header() {
   return (
-    <AppBar color='primary'>
+    <AppBar color='primary' position='fixed'>
       <Toolbar>
         <GraphicEqRoundedIcon />
         <Typography variant='h6' component='h1'>
