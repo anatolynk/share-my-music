@@ -1,5 +1,5 @@
 import { DeleteRounded } from "@mui/icons-material";
-import { Avatar, IconButton, Typography } from "@mui/material";
+import { Avatar, IconButton, Typography, useMediaQuery } from "@mui/material";
 import React from "react";
 
 const styles = {
@@ -26,6 +26,7 @@ const styles = {
 };
 
 function QueuedSongList() {
+  const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const song = {
     title: "LUNE",
     artist: "MOON",
@@ -34,15 +35,17 @@ function QueuedSongList() {
   };
 
   return (
-    <div style={{ margin: "10px 0" }}>
-      <Typography color='textPrimary' variant='button'>
-        QUEUE (5)
-      </Typography>
+    greaterThanMd && (
+      <div style={{ margin: "10px 0" }}>
+        <Typography color='textPrimary' variant='button'>
+          QUEUE (5)
+        </Typography>
 
-      {Array.from({ length: 5 }, () => song).map((song, i) => (
-        <QueuedSong key={i} song={song} />
-      ))}
-    </div>
+        {Array.from({ length: 5 }, () => song).map((song, i) => (
+          <QueuedSong key={i} song={song} />
+        ))}
+      </div>
+    )
   );
 }
 
