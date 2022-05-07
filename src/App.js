@@ -5,8 +5,6 @@ import Header from "./components/Header";
 import SongList from "./components/SongList";
 import SongPlayer from "./components/SongPlayer";
 
-// import theme from "../theme";
-
 function App() {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const greaterThanSm = useMediaQuery((theme) => theme.breakpoints.up("sm"));
