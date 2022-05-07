@@ -1,3 +1,4 @@
+import { qgl, useQuery } from "@apollo/client";
 import { LibraryAddRounded, PlayArrow } from "@mui/icons-material";
 import {
   Card,
@@ -9,18 +10,12 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { GET_SONGS } from "../graphql/queries";
 
 import theme from "../theme";
 
 function SongList() {
-  let loading = false;
-
-  const song = {
-    title: "LUNE",
-    artist: "MOON",
-    thumbnail:
-      "https://media.sellfy.com/images/fQjcOVwV/VuKJxSPX1blWoUdHgUpd/q35cEAtjvN.jpeg?w=760",
-  };
+  const { data, loading, error } = useQuery(GET_SONGS);
 
   if (loading) {
     return (
@@ -36,10 +31,12 @@ function SongList() {
       </div>
     );
   }
+
+  if (error) return <div>Error fetcheing songs</div>;
   return (
     <div>
-      {Array.from({ length: 10 }, () => song).map((song, i) => (
-        <Song key={i} song={song} />
+      {data.songs.map((song) => (
+        <Song key={song.id} song={song} />
       ))}
     </div>
   );
