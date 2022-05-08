@@ -8,12 +8,24 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+import SoundCloudPlayer from "react-player/soundcloud";
+import YouTubePlayer from "react-player/youtube";
 
 import theme from "../theme";
 
 function AddSong() {
   const [dialog, setDialog] = useState(false);
+
+  const [url, setUrl] = useState("");
+  const [playable, setPlayable] = useState(false);
+
+  useEffect(() => {
+    const isPlayable =
+      SoundCloudPlayer.canPlay(url) || YouTubePlayer.canPlay(url);
+    setPlayable(isPlayable);
+  }, [url]);
 
   function handleCloseDialog() {
     setDialog(false);
@@ -73,6 +85,8 @@ function AddSong() {
         </DialogActions>
       </Dialog>
       <TextField
+        onChange={(event) => setUrl(event.target.value)}
+        value={url}
         sx={styles.urlInput}
         placeholder='Add Music URL - youtube or soundcloud'
         fullWidth
@@ -87,6 +101,7 @@ function AddSong() {
         }}
       ></TextField>
       <Button
+        disabled={!playable}
         sx={styles.addSongButton}
         onClick={() => setDialog(true)}
         variant='contained'
