@@ -1,6 +1,7 @@
 import { AddBoxOutlined, Link } from "@mui/icons-material";
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -9,17 +10,34 @@ import {
   TextField,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
+import ReactPlayer from "react-player";
 
 import SoundCloudPlayer from "react-player/soundcloud";
 import YouTubePlayer from "react-player/youtube";
 
 import theme from "../theme";
 
+import { ADD_SONG } from "../graphql/mutation";
+import { useMutation } from "@apollo/client";
+
 function AddSong() {
   const [dialog, setDialog] = useState(false);
-
+  const [addSong, { error }] = useMutation(ADD_SONG);
   const [url, setUrl] = useState("");
   const [playable, setPlayable] = useState(false);
+
+  const DEFAULT_SONG = {
+    duration: 0,
+    title: "",
+    artist: "",
+    thumbnail: "",
+  };
+
+  const [song, setSong] = useState(DEFAULT_SONG);
+
+  function handleCloseDialog() {
+    setDialog(false);
+  }
 
   useEffect(() => {
     const isPlayable =
@@ -27,8 +45,74 @@ function AddSong() {
     setPlayable(isPlayable);
   }, [url]);
 
-  function handleCloseDialog() {
-    setDialog(false);
+  function handleChangeSong(event) {
+    const { name, value } = event.target;
+
+    setSong((prevSong) => ({
+      ...prevSong,
+      [name]: value,
+    }));
+  }
+
+  async function handleAddSong() {
+    try {
+      const { url, thumbnail, artist, title, duration } = song;
+
+      await addSong({
+        variables: {
+          url: url.length > 0 ? url : null,
+          thumbnail: thumbnail.length > 0 ? thumbnail : null,
+          artist: artist.length > 0 ? artist : null,
+          title: title.length > 0 ? title : null,
+          duration: duration > 0 ? duration : null,
+        },
+      });
+      handleCloseDialog();
+      setSong(DEFAULT_SONG);
+      setUrl("");
+    } catch (error) {
+      console.log("Error adding song: ", error);
+    }
+  }
+
+  async function handleEditSong({ player }) {
+    const nestedPlayer = player.player.player;
+    let songData;
+    if (nestedPlayer.getVideoData) {
+      // youtube link
+      songData = getYoutubeInfo(nestedPlayer);
+    } else if (nestedPlayer.getCurrentSound) {
+      // soundcloud link
+      songData = await getSoundCloudInfo(nestedPlayer);
+    }
+    setSong({ ...songData, url });
+  }
+
+  function getYoutubeInfo(player) {
+    const duration = player.getDuration();
+    const { title, video_id, author } = player.getVideoData();
+    const thumbnail = `http://img.youtube.com/vi/${video_id}/0.jpg`;
+    return {
+      duration,
+      title,
+      artist: author,
+      thumbnail,
+    };
+  }
+
+  function getSoundCloudInfo(player) {
+    return new Promise((resolve) => {
+      player.getCurrentSound((songData) => {
+        if (songData) {
+          resolve({
+            duration: Number(songData.duration / 1000),
+            title: songData.title,
+            artist: songData.user.username,
+            thumbnail: songData.artwork_url.replace("-large", "-t500x500"),
+          });
+        }
+      });
+    });
   }
 
   const styles = {
@@ -54,20 +138,46 @@ function AddSong() {
     },
   };
 
+  const { title, artist, thumbnail } = song;
+
   return (
     <div style={styles.container}>
       <Dialog sx={styles.dialog} open={dialog} onClose={handleCloseDialog}>
         <DialogTitle>Add Song</DialogTitle>
 
         <DialogContent>
-          <img
-            style={styles.thumbnail}
-            alt='Song Thumbnail'
-            src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8bXVzaWN8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60'
-          />
-          <TextField margin='dense' name='title' label='Title' fullWidth />
-          <TextField margin='dense' name='Artist' label='Artist' fullWidth />
+          {!thumbnail && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress color='primary' />
+            </div>
+          )}
+
+          <img style={styles.thumbnail} alt='Song Thumbnail' src={thumbnail} />
           <TextField
+            value={title}
+            margin='dense'
+            name='title'
+            label='Title'
+            fullWidth
+            onChange={handleChangeSong}
+          />
+          <TextField
+            onChange={handleChangeSong}
+            value={artist}
+            margin='dense'
+            name='artist'
+            label='Artist'
+            fullWidth
+          />
+          <TextField
+            value={thumbnail}
+            onChange={handleChangeSong}
             margin='dense'
             name='thumbnail'
             label='Thumbnail'
@@ -76,7 +186,11 @@ function AddSong() {
         </DialogContent>
 
         <DialogActions>
-          <Button variant='contained' color='secondary'>
+          <Button
+            onClick={handleEditSong}
+            variant='contained'
+            color='secondary'
+          >
             Add Song
           </Button>
           <Button onClick={handleCloseDialog} color='secondary'>
@@ -110,6 +224,7 @@ function AddSong() {
       >
         Add
       </Button>
+      <ReactPlayer url={url} hidden onReady={handleEditSong} />
     </div>
   );
 }
