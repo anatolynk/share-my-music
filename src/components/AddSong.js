@@ -9,6 +9,7 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
+
 import React, { useState, useEffect } from "react";
 import ReactPlayer from "react-player";
 
@@ -77,21 +78,25 @@ function AddSong() {
 
   async function handleEditSong({ player }) {
     const nestedPlayer = player.player.player;
+
     let songData;
+
     if (nestedPlayer.getVideoData) {
-      // youtube link
-      songData = getYoutubeInfo(nestedPlayer);
+      // it's youtube url
+      songData = await getYoutubeInfo(nestedPlayer);
     } else if (nestedPlayer.getCurrentSound) {
-      // soundcloud link
+      // it's soundcloud url
       songData = await getSoundCloudInfo(nestedPlayer);
     }
+
+    console.log("songData: ", songData);
     setSong({ ...songData, url });
   }
 
   function getYoutubeInfo(player) {
     const duration = player.getDuration();
     const { title, video_id, author } = player.getVideoData();
-    const thumbnail = `http://img.youtube.com/vi/${video_id}/0.jpg`;
+    const thumbnail = `https://img.youtube.com/vi/${video_id}/0.jpg`;
     return {
       duration,
       title,
@@ -138,6 +143,11 @@ function AddSong() {
     },
   };
 
+  function handleError(field) {
+    // return error.graphQLErrors[0].extensions.path.includes(field);
+    return error?.graphQLErrors[0]?.extensions?.path.includes(field);
+  }
+
   const { title, artist, thumbnail } = song;
 
   return (
@@ -165,6 +175,8 @@ function AddSong() {
             name='title'
             label='Title'
             fullWidth
+            error={() => handleError("title")}
+            helperText={handleError("title") && "Fill out field"}
             onChange={handleChangeSong}
           />
           <TextField
@@ -174,6 +186,8 @@ function AddSong() {
             name='artist'
             label='Artist'
             fullWidth
+            error={() => handleError("artist")}
+            helperText={handleError("artist") && "Fill out field"}
           />
           <TextField
             value={thumbnail}
@@ -182,15 +196,13 @@ function AddSong() {
             name='thumbnail'
             label='Thumbnail'
             fullWidth
+            error={() => handleError("thumbnail")}
+            helperText={handleError("thumbnail") && "Fill out field"}
           />
         </DialogContent>
 
         <DialogActions>
-          <Button
-            onClick={handleEditSong}
-            variant='contained'
-            color='secondary'
-          >
+          <Button onClick={handleAddSong} variant='contained' color='secondary'>
             Add Song
           </Button>
           <Button onClick={handleCloseDialog} color='secondary'>
@@ -224,7 +236,7 @@ function AddSong() {
       >
         Add
       </Button>
-      <ReactPlayer url={url} hidden onReady={handleEditSong} />
+      <ReactPlayer url={url} hidden={true} onReady={handleEditSong} />
     </div>
   );
 }
