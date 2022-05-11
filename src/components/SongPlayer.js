@@ -1,4 +1,5 @@
 import {
+  PauseCircleRounded,
   PlayArrowRounded,
   SkipNextRounded,
   SkipPreviousRounded,
@@ -47,7 +48,11 @@ const styles = {
 };
 
 function SongPlayer() {
-  const { state } = useContext(SongContext);
+  const { state, dispatch } = useContext(SongContext);
+
+  function handleToglePlay() {
+    dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
+  }
   return (
     <div>
       <Card sx={styles.container} variant='outlined'>
@@ -64,8 +69,12 @@ function SongPlayer() {
             <IconButton>
               <SkipPreviousRounded />
             </IconButton>
-            <IconButton>
-              <PlayArrowRounded sx={styles.playIcon} />
+            <IconButton onClick={handleToglePlay}>
+              {!state.isPlaying ? (
+                <PlayArrowRounded sx={styles.playIcon} />
+              ) : (
+                <PauseCircleRounded sx={styles.playIcon} />
+              )}
             </IconButton>
             <IconButton>
               <SkipNextRounded />
