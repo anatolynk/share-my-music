@@ -72,7 +72,7 @@ function AddSong() {
       setSong(DEFAULT_SONG);
       setUrl("");
     } catch (error) {
-      console.log("Error adding song: ", error);
+      // console.log("Error adding song: ", error);
     }
   }
 
@@ -89,7 +89,6 @@ function AddSong() {
       songData = await getSoundCloudInfo(nestedPlayer);
     }
 
-    console.log("songData: ", songData);
     setSong({ ...songData, url });
   }
 
@@ -175,7 +174,7 @@ function AddSong() {
             name='title'
             label='Title'
             fullWidth
-            error={() => handleError("title")}
+            error={handleError("title")}
             helperText={handleError("title") && "Fill out field"}
             onChange={handleChangeSong}
           />
@@ -186,7 +185,7 @@ function AddSong() {
             name='artist'
             label='Artist'
             fullWidth
-            error={() => handleError("artist")}
+            error={handleError("artist")}
             helperText={handleError("artist") && "Fill out field"}
           />
           <TextField
@@ -196,7 +195,7 @@ function AddSong() {
             name='thumbnail'
             label='Thumbnail'
             fullWidth
-            error={() => handleError("thumbnail")}
+            error={handleError("thumbnail")}
             helperText={handleError("thumbnail") && "Fill out field"}
           />
         </DialogContent>

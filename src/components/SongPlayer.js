@@ -11,10 +11,12 @@ import {
   Slider,
   Typography,
 } from "@mui/material";
-import React from "react";
+
+import React, { useContext } from "react";
 import QueuedSongList from "./QueuedSongList";
 
 import theme from "../theme";
+import { SongContext } from "../App";
 
 const styles = {
   container: {
@@ -45,16 +47,17 @@ const styles = {
 };
 
 function SongPlayer() {
+  const { state } = useContext(SongContext);
   return (
     <div>
       <Card sx={styles.container} variant='outlined'>
         <div style={styles.details}>
           <CardContent sx={styles.content}>
             <Typography variant='h5' component='h3'>
-              Title
+              {state.song.title}
             </Typography>
             <Typography variant='subtitle1' component='p' color='textPrimary'>
-              Artist
+              {state.song.artist}
             </Typography>
           </CardContent>
           <div style={styles.controls}>
@@ -73,10 +76,7 @@ function SongPlayer() {
           </div>
           <Slider type='range' min={0} max={1} ste={0.01}></Slider>
         </div>
-        <CardMedia
-          sx={styles.thumbnail}
-          image='https://media.sellfy.com/images/fQjcOVwV/VuKJxSPX1blWoUdHgUpd/q35cEAtjvN.jpeg?w=760'
-        />
+        <CardMedia sx={styles.thumbnail} image={state.song.thumbnail} />
       </Card>
       <QueuedSongList />
     </div>
