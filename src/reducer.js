@@ -1,5 +1,12 @@
 function songReducer(state, action) {
   switch (action.type) {
+    case "SET_SONG": {
+      return {
+        ...state,
+        song: action.payload.song,
+      };
+    }
+
     case "PLAY_SONG": {
       return {
         ...state,

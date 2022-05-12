@@ -1,5 +1,9 @@
 import { qgl, useQuery } from "@apollo/client";
-import { LibraryAddRounded, PlayArrow } from "@mui/icons-material";
+import {
+  LibraryAddRounded,
+  PlayArrow,
+  PauseCircleRounded,
+} from "@mui/icons-material";
 import {
   Card,
   CardActions,
@@ -9,11 +13,13 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 
 import { GET_SONGS } from "../graphql/queries";
 
 import theme from "../theme";
+
+import { SongContext } from "../App";
 
 function SongList() {
   const { data, loading, error } = useQuery(GET_SONGS);
@@ -60,15 +66,34 @@ const styles = {
     objectFit: "cover",
     width: 140,
     height: 140,
+    cursor: "pointer",
   },
 };
 
 function Song({ song }) {
+  const { state, dispatch } = useContext(SongContext);
   const { title, artist, thumbnail } = song;
+
+  const [currentSongPlaying, setCurrentSongPlaying] = useState(false);
+
+  useEffect(() => {
+    const isSongPlaying = state.isPlaying && song.id === state.song.id;
+    setCurrentSongPlaying(isSongPlaying);
+  }, [song.id, state.song.id, state.isPlaying]);
+
+  function handleToglePlay() {
+    dispatch({ type: "SET_SONG", payload: { song } });
+    dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
+  }
+
   return (
     <Card sx={styles.container}>
       <div style={styles.songInfoContainer}>
-        <CardMedia image={thumbnail} sx={styles.thumbnail} />
+        <CardMedia
+          image={thumbnail}
+          sx={styles.thumbnail}
+          onClick={handleToglePlay}
+        />
         <div style={styles.songInfo}>
           <CardContent>
             <Typography gutterBottom variant='h5' component='h2'>
@@ -79,8 +104,8 @@ function Song({ song }) {
             </Typography>
           </CardContent>
           <CardActions>
-            <IconButton size='small' color='primary'>
-              <PlayArrow />
+            <IconButton size='small' color='primary' onClick={handleToglePlay}>
+              {!currentSongPlaying ? <PlayArrow /> : <PauseCircleRounded />}
             </IconButton>
             <IconButton size='small' color='primary'>
               <LibraryAddRounded />
