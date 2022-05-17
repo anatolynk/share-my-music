@@ -66,11 +66,10 @@ function SongPlayer() {
   // Play Next Song from queue automatically
   useEffect(() => {
     const nextSong = data.queue[positionInQueue + 1];
-    console.log(nextSong);
-    if (played === 1 && nextSong) {
+    if (played >= 0.95 && nextSong) {
       console.log("next song");
-      dispatch({ type: "SET_SONG", payload: { song: nextSong } });
       setPlayed(0);
+      dispatch({ type: "SET_SONG", payload: { song: nextSong } });
     }
   }, [data.queue, played, dispatch, positionInQueue]);
 
@@ -100,6 +99,20 @@ function SongPlayer() {
     return new Date(seconds * 1000).toISOString().substr(11, 8);
   }
 
+  function handlePlayPrevSong() {
+    const prevSong = data.queue[positionInQueue - 1];
+    if (prevSong) {
+      dispatch({ type: "SET_SONG", payload: { song: prevSong } });
+    }
+  }
+
+  function handlePlayNextSong() {
+    const nextSong = data.queue[positionInQueue + 1];
+    if (nextSong) {
+      dispatch({ type: "SET_SONG", payload: { song: nextSong } });
+    }
+  }
+
   return (
     <div>
       <Card sx={styles.container} variant='outlined'>
@@ -113,7 +126,7 @@ function SongPlayer() {
             </Typography>
           </CardContent>
           <div style={styles.controls}>
-            <IconButton>
+            <IconButton onClick={handlePlayPrevSong}>
               <SkipPreviousRounded />
             </IconButton>
             <IconButton onClick={handleToglePlay}>
@@ -123,7 +136,7 @@ function SongPlayer() {
                 <PauseCircleRounded sx={styles.playIcon} />
               )}
             </IconButton>
-            <IconButton>
+            <IconButton onClick={handlePlayNextSong}>
               <SkipNextRounded />
             </IconButton>
             <Typography variant='subtitle1' component='p' color='textPrimary'>
