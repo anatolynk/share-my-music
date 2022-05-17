@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import QueuedSongList from "./QueuedSongList";
 
 import theme from "../theme";
@@ -61,17 +61,31 @@ function SongPlayer() {
 
   const [seeking, setSeeking] = useState(false);
 
+  const [positionInQueue, setPositionInQueue] = useState(0);
+
+  // Play Next Song from queue automatically
+  useEffect(() => {
+    const nextSong = data.queue[positionInQueue + 1];
+    console.log(nextSong);
+    if (played === 1 && nextSong) {
+      console.log("next song");
+      dispatch({ type: "SET_SONG", payload: { song: nextSong } });
+      setPlayed(0);
+    }
+  }, [data.queue, played, dispatch, positionInQueue]);
+
   useEffect(() => {
     const songIndex = data.queue.findIndex((song) => song.id === state.song.id);
-  }, [state.song.id]);
+    setPositionInQueue(songIndex);
+  }, [data.queue, state.song.id]);
 
+  // Toggle Play/Pause
   function handleToglePlay() {
     dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
   }
 
   function handleProgressChange(event, newValue) {
     setPlayed(newValue);
-    console.log(newValue);
   }
 
   function handleSeekingMouseDown() {

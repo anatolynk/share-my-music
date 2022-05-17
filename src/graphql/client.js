@@ -1,8 +1,17 @@
-import { ApolloClient, InMemoryCache, gql, makeVar } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  gql,
+  makeVar,
+  HttpLink,
+} from "@apollo/client";
+
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+
 import { GET_QUEUED_SONGS } from "./queries";
 
 const client = new ApolloClient({
-  uri: "https://apollo-sharemymusic.hasura.app/v1/graphql",
+  uri: "https://apollo-sharemymusic.hasura.app/v1/graphql/",
   cache: new InMemoryCache(),
 
   typeDefs: gql`
