@@ -13,3 +13,17 @@ export const GET_SONGS = gql`
     }
   }
 `;
+
+export const GET_QUEUED_SONGS = gql`
+  query getQueuedSongs {
+    queue @client {
+      url
+      title
+      thumbnail
+      id
+      duration
+      created_at
+      artist
+    }
+  }
+`;

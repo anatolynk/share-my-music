@@ -1,6 +1,8 @@
+import { useMutation } from "@apollo/client";
 import { DeleteRounded } from "@mui/icons-material";
 import { Avatar, IconButton, Typography, useMediaQuery } from "@mui/material";
 import React from "react";
+import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
 
 const styles = {
   avatar: {
@@ -25,23 +27,17 @@ const styles = {
   },
 };
 
-function QueuedSongList() {
+function QueuedSongList({ queue }) {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
-  const song = {
-    title: "LUNE",
-    artist: "MOON",
-    thumbnail:
-      "https://media.sellfy.com/images/fQjcOVwV/VuKJxSPX1blWoUdHgUpd/q35cEAtjvN.jpeg?w=760",
-  };
 
   return (
     greaterThanMd && (
       <div style={{ margin: "10px 0" }}>
         <Typography color='textPrimary' variant='button'>
-          QUEUE (5)
+          QUEUE ({queue.length})
         </Typography>
 
-        {Array.from({ length: 5 }, () => song).map((song, i) => (
+        {queue.map((song, i) => (
           <QueuedSong key={i} song={song} />
         ))}
       </div>
@@ -51,6 +47,18 @@ function QueuedSongList() {
 
 function QueuedSong({ song }) {
   const { thumbnail, artist, title } = song;
+  const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
+    onCompleted: (data) => {
+      localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
+    },
+  });
+  function handleAddOrRemoveFromQueue() {
+    addOrRemoveFromQueue({
+      variables: {
+        input: { ...song, __typename: "Song" },
+      },
+    });
+  }
   return (
     <div style={styles.container}>
       <Avatar sx={styles.avatar} src={thumbnail} />
@@ -62,7 +70,7 @@ function QueuedSong({ song }) {
           {artist}
         </Typography>
       </div>
-      <IconButton>
+      <IconButton onClick={handleAddOrRemoveFromQueue}>
         <DeleteRounded color='error' />
       </IconButton>
     </div>

@@ -1,9 +1,12 @@
-import { qgl, useQuery } from "@apollo/client";
+import { qgl, useMutation, useQuery } from "@apollo/client";
 import {
   LibraryAddRounded,
   PlayArrow,
   PauseCircleRounded,
 } from "@mui/icons-material";
+
+import IndeterminateCheckBoxRoundedIcon from "@mui/icons-material/IndeterminateCheckBoxRounded";
+
 import {
   Card,
   CardActions,
@@ -20,6 +23,9 @@ import { GET_SONGS } from "../graphql/queries";
 import theme from "../theme";
 
 import { SongContext } from "../App";
+import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
+
+import { data } from "../graphql/queue";
 
 function SongList() {
   const { data, loading, error } = useQuery(GET_SONGS);
@@ -71,6 +77,11 @@ const styles = {
 };
 
 function Song({ song }) {
+  const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
+    onCompleted: (data) => {
+      localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
+    },
+  });
   const { state, dispatch } = useContext(SongContext);
   const { title, artist, thumbnail } = song;
 
@@ -86,8 +97,16 @@ function Song({ song }) {
     dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
   }
 
+  function handleAddOrRemoveFromQueue() {
+    addOrRemoveFromQueue({
+      variables: {
+        input: { ...song, __typename: "Song" },
+      },
+    });
+  }
+
   return (
-    <Card sx={styles.container}>
+    <Card sx={styles.container} variant='outlined'>
       <div style={styles.songInfoContainer}>
         <CardMedia
           image={thumbnail}
@@ -107,8 +126,13 @@ function Song({ song }) {
             <IconButton size='small' color='primary' onClick={handleToglePlay}>
               {!currentSongPlaying ? <PlayArrow /> : <PauseCircleRounded />}
             </IconButton>
-            <IconButton size='small' color='primary'>
+            <IconButton
+              onClick={handleAddOrRemoveFromQueue}
+              size='small'
+              color='primary'
+            >
               <LibraryAddRounded />
+              <IndeterminateCheckBoxRoundedIcon />
             </IconButton>
           </CardActions>
         </div>
