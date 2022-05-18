@@ -1,7 +1,9 @@
-import { useMutation } from "@apollo/client";
+import React from "react";
+
 import { DeleteRounded } from "@mui/icons-material";
 import { Avatar, IconButton, Typography, useMediaQuery } from "@mui/material";
-import React from "react";
+
+import { useMutation } from "@apollo/client";
 import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
 
 const styles = {

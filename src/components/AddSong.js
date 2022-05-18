@@ -20,10 +20,13 @@ import theme from "../theme";
 
 import { ADD_SONG } from "../graphql/mutation";
 import { useMutation } from "@apollo/client";
+import { GET_SONGS } from "../graphql/queries";
 
 function AddSong() {
   const [dialog, setDialog] = useState(false);
-  const [addSong, { error }] = useMutation(ADD_SONG);
+  const [addSong, { error }] = useMutation(ADD_SONG, {
+    refetchQueries: [{ query: GET_SONGS }],
+  });
   const [url, setUrl] = useState("");
   const [playable, setPlayable] = useState(false);
 
@@ -143,7 +146,6 @@ function AddSong() {
   };
 
   function handleError(field) {
-    // return error.graphQLErrors[0].extensions.path.includes(field);
     return error?.graphQLErrors[0]?.extensions?.path.includes(field);
   }
 

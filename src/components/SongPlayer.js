@@ -52,6 +52,7 @@ const styles = {
 };
 
 function SongPlayer() {
+  // Local State Management Query for Queued Songs
   const { data, loading, error } = useQuery(GET_QUEUED_SONGS);
   const reactPlayerRef = React.useRef();
   const { state, dispatch } = useContext(SongContext);
@@ -59,6 +60,7 @@ function SongPlayer() {
   const [played, setPlayed] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
 
+  // True or False when we change current song position from slider
   const [seeking, setSeeking] = useState(false);
 
   const [positionInQueue, setPositionInQueue] = useState(0);
@@ -83,22 +85,28 @@ function SongPlayer() {
     dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
   }
 
+  // Сhange Progress value given from Slider
   function handleProgressChange(event, newValue) {
     setPlayed(newValue);
   }
 
+  // Set new progress value after push mouse button
   function handleSeekingMouseDown() {
     setSeeking(true);
   }
+
+  // Set new progress value after release mouse button
   function handleSeekingMouseUp() {
     setSeeking(false);
     reactPlayerRef.current.seekTo(played);
   }
 
+  // Convert seconds timestamp into comfort format hh:mm:ss
   function formatDuratiom(seconds) {
     return new Date(seconds * 1000).toISOString().substr(11, 8);
   }
 
+  // Play previous song from queue after clicking prev arrow button
   function handlePlayPrevSong() {
     const prevSong = data.queue[positionInQueue - 1];
     if (prevSong) {
@@ -106,6 +114,7 @@ function SongPlayer() {
     }
   }
 
+  // Play next song from queue after clicking next arrow button
   function handlePlayNextSong() {
     const nextSong = data.queue[positionInQueue + 1];
     if (nextSong) {

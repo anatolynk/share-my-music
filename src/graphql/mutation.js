@@ -27,3 +27,14 @@ export const ADD_SONG = gql`
     }
   }
 `;
+
+export const DELETE_SONG = gql`
+  mutation deleteSong($id: uuid!) {
+    delete_songs(where: { id: { _eq: $id } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;

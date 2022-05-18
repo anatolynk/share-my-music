@@ -1,5 +1,12 @@
 function songReducer(state, action) {
   switch (action.type) {
+    case "DELETE_SONG": {
+      console.log(action.payload.id);
+      return {
+        ...state,
+      };
+    }
+
     case "SET_SONG": {
       return {
         ...state,

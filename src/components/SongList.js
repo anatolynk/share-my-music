@@ -5,30 +5,34 @@ import {
   PauseCircleRounded,
 } from "@mui/icons-material";
 
+import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
+
 import IndeterminateCheckBoxRoundedIcon from "@mui/icons-material/IndeterminateCheckBoxRounded";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 
 import {
+  Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
   CircularProgress,
   IconButton,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
 import React, { useContext, useState, useEffect } from "react";
 
-import { GET_SONGS } from "../graphql/queries";
-
 import theme from "../theme";
 
 import { SongContext } from "../App";
-import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
 
-import { data } from "../graphql/queue";
+import { GET_SONGS } from "../graphql/queries";
+import { ADD_OR_REMOVE_FROM_QUEUE, DELETE_SONG } from "../graphql/mutation";
 
 function SongList() {
-  const { data, loading, error } = useQuery(GET_SONGS);
+  const { data, loading, error, refetch } = useQuery(GET_SONGS);
 
   if (loading) {
     return (
@@ -45,9 +49,20 @@ function SongList() {
     );
   }
 
-  if (error) return <div>Error fetcheing songs</div>;
+  if (error) return <div>Error fetching songs</div>;
+
   return (
     <div>
+      <center>
+        <IconButton
+          onClick={() => refetch({})}
+          variant='outlined'
+          color='primary'
+        >
+          <RefreshRoundedIcon />
+        </IconButton>
+      </center>
+
       {data.songs.map((song) => (
         <Song key={song.id} song={song} />
       ))}
@@ -77,6 +92,12 @@ const styles = {
 };
 
 function Song({ song }) {
+  // Remove song from PlayList and refetch it
+  const [deleteSong] = useMutation(DELETE_SONG, {
+    refetchQueries: [{ query: GET_SONGS }],
+  });
+
+  // Add or Remove Song from queue
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
@@ -95,6 +116,14 @@ function Song({ song }) {
   function handleToglePlay() {
     dispatch({ type: "SET_SONG", payload: { song } });
     dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
+  }
+
+  async function handleDeleteSong() {
+    await deleteSong({
+      variables: {
+        id: song.id,
+      },
+    });
   }
 
   function handleAddOrRemoveFromQueue() {
@@ -133,6 +162,9 @@ function Song({ song }) {
             >
               <LibraryAddRounded />
               <IndeterminateCheckBoxRoundedIcon />
+            </IconButton>
+            <IconButton onClick={handleDeleteSong} size='small' color='primary'>
+              <DeleteRoundedIcon />
             </IconButton>
           </CardActions>
         </div>
