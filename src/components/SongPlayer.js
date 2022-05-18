@@ -111,6 +111,8 @@ function SongPlayer() {
     const prevSong = data.queue[positionInQueue - 1];
     if (prevSong) {
       dispatch({ type: "SET_SONG", payload: { song: prevSong } });
+    } else {
+      reactPlayerRef.current.seekTo(0);
     }
   }
 
@@ -119,6 +121,8 @@ function SongPlayer() {
     const nextSong = data.queue[positionInQueue + 1];
     if (nextSong) {
       dispatch({ type: "SET_SONG", payload: { song: nextSong } });
+    } else {
+      dispatch({ type: "PAUSE_SONG" });
     }
   }
 

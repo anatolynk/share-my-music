@@ -1,5 +1,6 @@
 import { AddBoxOutlined, Link } from "@mui/icons-material";
 import {
+  Avatar,
   Button,
   CircularProgress,
   Dialog,
@@ -140,8 +141,14 @@ function AddSong() {
     dialog: {
       textAlign: "center",
     },
+    center: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
     thumbnail: {
-      width: "90%",
+      width: "50%",
+      height: "50%",
     },
   };
 
@@ -168,8 +175,13 @@ function AddSong() {
               <CircularProgress color='primary' />
             </div>
           )}
-
-          <img style={styles.thumbnail} alt='Song Thumbnail' src={thumbnail} />
+          <div style={styles.center}>
+            <Avatar
+              sx={styles.thumbnail}
+              alt='Song Thumbnail'
+              src={thumbnail}
+            />
+          </div>
           <TextField
             value={title}
             margin='dense'

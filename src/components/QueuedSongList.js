@@ -1,7 +1,20 @@
 import React from "react";
 
 import { DeleteRounded } from "@mui/icons-material";
-import { Avatar, IconButton, Typography, useMediaQuery } from "@mui/material";
+import {
+  Avatar,
+  Card,
+  CardContent,
+  IconButton,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
 
 import { useMutation } from "@apollo/client";
 import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
@@ -34,15 +47,17 @@ function QueuedSongList({ queue }) {
 
   return (
     greaterThanMd && (
-      <div style={{ margin: "10px 0" }}>
-        <Typography color='textPrimary' variant='button'>
-          QUEUE ({queue.length})
-        </Typography>
+      <Card sx={{ margin: "10px 0" }}>
+        <CardContent>
+          <Typography color='textPrimary' variant='button'>
+            QUEUE ({queue.length})
+          </Typography>
 
-        {queue.map((song, i) => (
-          <QueuedSong key={i} song={song} />
-        ))}
-      </div>
+          {queue.map((song, i) => (
+            <QueuedSong key={i} song={song} />
+          ))}
+        </CardContent>
+      </Card>
     )
   );
 }
@@ -62,20 +77,18 @@ function QueuedSong({ song }) {
     });
   }
   return (
-    <div style={styles.container}>
-      <Avatar sx={styles.avatar} src={thumbnail} />
-      <div style={styles.songInfoContainer}>
-        <Typography variant='subtitle2' sx={styles.text}>
-          {title}
-        </Typography>
-        <Typography color='textPrimary' variant='body2' sx={styles.text}>
-          {artist}
-        </Typography>
-      </div>
-      <IconButton onClick={handleAddOrRemoveFromQueue}>
-        <DeleteRounded color='error' />
-      </IconButton>
-    </div>
+    <List>
+      <ListItem alignItems='flex-start'>
+        <ListItemAvatar>
+          <Avatar sx={styles.avatar} src={thumbnail} />
+        </ListItemAvatar>
+        <ListItemText primary={title} secondary={artist} />
+        <IconButton onClick={handleAddOrRemoveFromQueue}>
+          <DeleteRounded color='error' />
+        </IconButton>
+      </ListItem>
+      <Divider variant='inset' component='li' />
+    </List>
   );
 }
 
