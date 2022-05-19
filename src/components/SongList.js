@@ -10,7 +10,12 @@ import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import IndeterminateCheckBoxRoundedIcon from "@mui/icons-material/IndeterminateCheckBoxRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 
+import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+
 import {
+  Alert,
   Button,
   Card,
   CardActions,
@@ -22,6 +27,10 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+
+import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
+import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
+
 import React, { useContext, useState, useEffect } from "react";
 
 import theme from "../theme";
@@ -49,7 +58,14 @@ function SongList() {
     );
   }
 
-  if (error) return <div>Error fetching songs</div>;
+  if (error) return <Alert severity='error'>Error fetching songs</Alert>;
+
+  const queueList = JSON.parse(localStorage.getItem("queue"));
+
+  // Find song.id inside queue array
+  const isAddedToQueue = (s, q) => {
+    return q.filter((e) => e.id == s.id).length > 0;
+  };
 
   return (
     <div>
@@ -64,7 +80,11 @@ function SongList() {
       </center>
 
       {data.songs.map((song) => (
-        <Song key={song.id} song={song} />
+        <Song
+          key={song.id}
+          song={song}
+          isInQueueList={isAddedToQueue(song, queueList)}
+        />
       ))}
     </div>
   );
@@ -91,7 +111,8 @@ const styles = {
   },
 };
 
-function Song({ song }) {
+function Song({ song, isInQueueList }) {
+  const [addedInQueue, setAddedInQueue] = useState(isInQueueList);
   // Remove song from PlayList and refetch it
   const [deleteSong] = useMutation(DELETE_SONG, {
     refetchQueries: [{ query: GET_SONGS }],
@@ -101,6 +122,7 @@ function Song({ song }) {
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
+      setAddedInQueue((e) => !e);
     },
   });
   const { state, dispatch } = useContext(SongContext);
@@ -160,8 +182,7 @@ function Song({ song }) {
               size='small'
               color='primary'
             >
-              <LibraryAddRounded />
-              <IndeterminateCheckBoxRoundedIcon />
+              {!addedInQueue ? <PlaylistAddIcon /> : <RemoveCircleIcon />}
             </IconButton>
             <IconButton onClick={handleDeleteSong} size='small' color='primary'>
               <DeleteRoundedIcon />

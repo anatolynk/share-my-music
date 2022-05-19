@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 
-import { DeleteRounded } from "@mui/icons-material";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import {
   Avatar,
   Card,
@@ -16,14 +16,21 @@ import Divider from "@mui/material/Divider";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 
+import EqualizerRoundedIcon from "@mui/icons-material/EqualizerRounded";
+import MusicNoteRoundedIcon from "@mui/icons-material/MusicNoteRounded";
+
 import { useMutation } from "@apollo/client";
 import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
+import { SongContext } from "../App";
+import { style } from "@mui/system";
 
 const styles = {
   avatar: {
     width: 44,
     height: 44,
+    cursor: "pointer",
   },
+
   text: {
     textOverflow: "ellipsis",
     overflow: "hidden",
@@ -39,6 +46,10 @@ const styles = {
   songInfoContainer: {
     overflow: "hidden",
     whiteSpace: "nowrap",
+  },
+  playnow: {
+    backgroundColor: "#E8E8E8",
+    borderRadius: "10px",
   },
 };
 
@@ -64,11 +75,15 @@ function QueuedSongList({ queue }) {
 
 function QueuedSong({ song }) {
   const { thumbnail, artist, title } = song;
+
+  const { state, dispatch } = useContext(SongContext);
+
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
     },
   });
+
   function handleAddOrRemoveFromQueue() {
     addOrRemoveFromQueue({
       variables: {
@@ -76,15 +91,28 @@ function QueuedSong({ song }) {
       },
     });
   }
+
+  function handleToglePlay() {
+    dispatch({ type: "SET_SONG", payload: { song } });
+    dispatch({ type: "PLAY_SONG" });
+  }
+
   return (
     <List>
-      <ListItem alignItems='flex-start'>
+      <ListItem
+        alignItems='flex-start'
+        sx={song.id === state.song.id ? styles.playnow : null}
+      >
         <ListItemAvatar>
-          <Avatar sx={styles.avatar} src={thumbnail} />
+          <Avatar
+            onClick={handleToglePlay}
+            sx={styles.avatar}
+            src={thumbnail}
+          />
         </ListItemAvatar>
         <ListItemText primary={title} secondary={artist} />
         <IconButton onClick={handleAddOrRemoveFromQueue}>
-          <DeleteRounded color='error' />
+          <RemoveCircleIcon color='action' />
         </IconButton>
       </ListItem>
       <Divider variant='inset' component='li' />
