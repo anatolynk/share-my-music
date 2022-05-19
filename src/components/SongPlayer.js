@@ -108,17 +108,22 @@ function SongPlayer() {
 
   // Play previous song from queue after clicking prev arrow button
   function handlePlayPrevSong() {
-    const prevSong = data.queue[positionInQueue - 1];
+    const prevSong = data.queue[positionInQueue - 1]
+      ? data.queue[positionInQueue - 1]
+      : data.queue[data.queue.length - 1];
     if (prevSong) {
       dispatch({ type: "SET_SONG", payload: { song: prevSong } });
     } else {
       reactPlayerRef.current.seekTo(0);
+      dispatch({ type: "PAUSE_SONG" });
     }
   }
 
   // Play next song from queue after clicking next arrow button
   function handlePlayNextSong() {
-    const nextSong = data.queue[positionInQueue + 1];
+    const nextSong = data.queue[positionInQueue + 1]
+      ? data.queue[positionInQueue + 1]
+      : data.queue[0];
     if (nextSong) {
       dispatch({ type: "SET_SONG", payload: { song: nextSong } });
     } else {

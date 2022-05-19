@@ -64,7 +64,7 @@ function SongList() {
 
   // Find song.id inside queue array
   const isAddedToQueue = (s, q) => {
-    return q.filter((e) => e.id == s.id).length > 0;
+    return q.filter((e) => e.id === s.id).length > 0;
   };
 
   return (
@@ -111,8 +111,7 @@ const styles = {
   },
 };
 
-function Song({ song, isInQueueList }) {
-  const [addedInQueue, setAddedInQueue] = useState(isInQueueList);
+function Song({ song }) {
   // Remove song from PlayList and refetch it
   const [deleteSong] = useMutation(DELETE_SONG, {
     refetchQueries: [{ query: GET_SONGS }],
@@ -122,7 +121,6 @@ function Song({ song, isInQueueList }) {
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
-      setAddedInQueue((e) => !e);
     },
   });
   const { state, dispatch } = useContext(SongContext);
@@ -182,7 +180,7 @@ function Song({ song, isInQueueList }) {
               size='small'
               color='primary'
             >
-              {!addedInQueue ? <PlaylistAddIcon /> : <RemoveCircleIcon />}
+              <PlaylistAddIcon />
             </IconButton>
             <IconButton onClick={handleDeleteSong} size='small' color='primary'>
               <DeleteRoundedIcon />

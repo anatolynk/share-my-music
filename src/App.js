@@ -13,7 +13,7 @@ export const SongContext = createContext({
     title: "HeɅven - Memories We Make (feat. Schmorgle)",
     artist: "Schmorgle",
     thumbnail: "https://img.youtube.com/vi/TC4Day25FfI/0.jpg",
-    url: "https://www.youtube.com/watch?v=pxxeqmaCE-Q&list=PLs5sIYgM4NpKSES21ODWQIZVypLNj8Fl4&index=2",
+    url: "https://www.youtube.com/watch?v=pxxeqmaCE-Q",
     duration: 170,
   },
   isPlaying: false,

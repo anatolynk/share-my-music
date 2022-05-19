@@ -90,6 +90,7 @@ function QueuedSong({ song }) {
         input: { ...song, __typename: "Song" },
       },
     });
+    console.log(state);
   }
 
   function handleToglePlay() {
