@@ -104,6 +104,17 @@ function QueuedSongList({ queue, reactPlayerRef }) {
         },
       });
     });
+
+    toast((t) => (
+      <div>
+        <Typography variant='body1' gutterBottom component='div'>
+          All Songs removed from queue
+          <IconButton onClick={() => toast.dismiss(t.id)}>
+            <CloseIcon fontSize='small' />
+          </IconButton>
+        </Typography>
+      </div>
+    ));
   }
 
   return (
@@ -214,7 +225,6 @@ function QueuedSong({ song }) {
           }
           secondary={artist}
         />
-        {/* <ListItemText secondary={formatDuratiom(duration)} /> */}
         <Typography
           variant='subtitle2'
           component='p'

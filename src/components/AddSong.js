@@ -9,6 +9,7 @@ import {
   DialogTitle,
   InputAdornment,
   TextField,
+  Typography,
 } from "@mui/material";
 
 import React, { useState, useEffect } from "react";
@@ -101,11 +102,13 @@ function AddSong() {
   function getYoutubeInfo(player) {
     const duration = player.getDuration();
     const { title, video_id, author } = player.getVideoData();
+    const newArtist = title.split(" ")[0] ? title.split(" ")[0] : "Artist Name";
+
     const thumbnail = `https://img.youtube.com/vi/${video_id}/0.jpg`;
     return {
       duration,
       title,
-      artist: author,
+      artist: newArtist,
       thumbnail,
     };
   }
@@ -251,6 +254,7 @@ function AddSong() {
       >
         Add
       </Button>
+
       <ReactPlayer url={url} hidden={true} onReady={handleEditSong} />
     </div>
   );

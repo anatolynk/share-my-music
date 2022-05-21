@@ -7,16 +7,15 @@ import {
 
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 
-import IndeterminateCheckBoxRoundedIcon from "@mui/icons-material/IndeterminateCheckBoxRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import CloseIcon from "@mui/icons-material/Close";
 
 import {
   Alert,
+  Breadcrumbs,
   Button,
   Card,
   CardActions,
@@ -24,6 +23,7 @@ import {
   CardMedia,
   CircularProgress,
   IconButton,
+  Link,
   Tab,
   Tabs,
   Typography,
@@ -44,6 +44,8 @@ import toast from "react-hot-toast";
 
 function SongList() {
   const { data, loading, error, refetch } = useQuery(GET_SONGS);
+
+  const [AlertNotification, setAlertNotification] = useState(true);
 
   if (loading) {
     return (
@@ -72,6 +74,43 @@ function SongList() {
   return (
     <div>
       <center>
+        {AlertNotification && (
+          <Card sx={styles.container} variant='outlined'>
+            <div>
+              <Alert
+                sx={styles.songInfoContainer}
+                variant='outlined'
+                severity='success'
+                onClose={(e) => {
+                  setAlertNotification(false);
+                }}
+              >
+                Find any song from&nbsp;
+                <Link
+                  href='https://soundcloud.com/digitalstreams/sets/drivehomemixtape'
+                  underline='hover'
+                  target='_blank'
+                  rel='noreferrer'
+                  color='secondary'
+                >
+                  SoundCloud
+                </Link>
+                &nbsp;or&nbsp;
+                <Link
+                  href='https://www.youtube.com/c/TSGMusic/videos'
+                  underline='hover'
+                  target='_blank'
+                  rel='noreferrer'
+                  color='secondary'
+                >
+                  YouTube
+                </Link>
+                , copy and paste URL link here.
+              </Alert>
+            </div>
+          </Card>
+        )}
+
         <IconButton
           onClick={() => refetch({})}
           variant='outlined'
@@ -109,7 +148,7 @@ const styles = {
   },
 };
 
-function Song({ song, isInQueueList }) {
+function Song({ song }) {
   const [deletedSongStyle, setDeletedSongStyle] = useState(false);
   // Remove song from PlayList and refetch it
   const [deleteSong] = useMutation(DELETE_SONG, {

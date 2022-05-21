@@ -45,10 +45,10 @@ function App() {
           style={
             greaterThanMd
               ? {
-                  position: "fixed",
+                  position: "relative",
                   width: "100%",
                   right: 20,
-                  top: 70,
+                  top: 80,
                 }
               : {
                   position: "fixed",
