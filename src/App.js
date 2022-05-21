@@ -6,6 +6,7 @@ import SongList from "./components/SongList";
 import SongPlayer from "./components/SongPlayer";
 
 import songReducer from "./reducer";
+import Footer from "./components/Footer";
 
 export const SongContext = createContext({
   song: {
@@ -64,6 +65,9 @@ function App() {
           <SongPlayer />
         </Grid>
       </Grid>
+      <Hidden only='xs'>
+        <Footer />
+      </Hidden>
     </SongContext.Provider>
   );
 }
