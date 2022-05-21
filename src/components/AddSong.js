@@ -22,6 +22,7 @@ import theme from "../theme";
 import { ADD_SONG } from "../graphql/mutation";
 import { useMutation } from "@apollo/client";
 import { GET_SONGS } from "../graphql/queries";
+import toast from "react-hot-toast";
 
 function AddSong() {
   const [dialog, setDialog] = useState(false);
@@ -75,8 +76,9 @@ function AddSong() {
       handleCloseDialog();
       setSong(DEFAULT_SONG);
       setUrl("");
+      toast.success(`Song ${song.title} successfully added!`);
     } catch (error) {
-      // console.log("Error adding song: ", error);
+      toast.error(`Error adding song: ${error}`);
     }
   }
 

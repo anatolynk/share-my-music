@@ -1,7 +1,6 @@
 function songReducer(state, action) {
   switch (action.type) {
     case "DELETE_SONG": {
-      console.log(action.payload.id);
       return {
         ...state,
       };
@@ -17,6 +16,7 @@ function songReducer(state, action) {
     case "PLAY_SONG": {
       return {
         ...state,
+        // song: action.payload.song,
         isPlaying: true,
       };
     }
@@ -24,12 +24,13 @@ function songReducer(state, action) {
     case "PAUSE_SONG": {
       return {
         ...state,
+        // song: action.payload.song,
         isPlaying: false,
       };
     }
 
     default:
-      return state;
+      return { ...state };
   }
 }
 

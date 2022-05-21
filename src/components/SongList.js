@@ -13,6 +13,7 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import CloseIcon from "@mui/icons-material/Close";
 
 import {
   Alert,
@@ -39,6 +40,7 @@ import { SongContext } from "../App";
 
 import { GET_SONGS } from "../graphql/queries";
 import { ADD_OR_REMOVE_FROM_QUEUE, DELETE_SONG } from "../graphql/mutation";
+import toast from "react-hot-toast";
 
 function SongList() {
   const { data, loading, error, refetch } = useQuery(GET_SONGS);
@@ -60,12 +62,12 @@ function SongList() {
 
   if (error) return <Alert severity='error'>Error fetching songs</Alert>;
 
-  const queueList = JSON.parse(localStorage.getItem("queue"));
+  // const queueList = JSON.parse(localStorage.getItem("queue"));
 
-  // Find song.id inside queue array
-  const isAddedToQueue = (s, q) => {
-    return q.filter((e) => e.id === s.id).length > 0;
-  };
+  // // Find song.id inside queue array
+  // const isAddedToQueue = (s, q) => {
+  //   return q.filter((e) => e.id === s.id).length > 0;
+  // };
 
   return (
     <div>
@@ -80,11 +82,7 @@ function SongList() {
       </center>
 
       {data.songs.map((song) => (
-        <Song
-          key={song.id}
-          song={song}
-          isInQueueList={isAddedToQueue(song, queueList)}
-        />
+        <Song key={song.id} song={song} />
       ))}
     </div>
   );
@@ -111,7 +109,8 @@ const styles = {
   },
 };
 
-function Song({ song }) {
+function Song({ song, isInQueueList }) {
+  const [deletedSongStyle, setDeletedSongStyle] = useState(false);
   // Remove song from PlayList and refetch it
   const [deleteSong] = useMutation(DELETE_SONG, {
     refetchQueries: [{ query: GET_SONGS }],
@@ -121,8 +120,10 @@ function Song({ song }) {
   const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
     onCompleted: (data) => {
       localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
+      setDeletedSongStyle(false);
     },
   });
+
   const { state, dispatch } = useContext(SongContext);
   const { title, artist, thumbnail } = song;
 
@@ -135,15 +136,31 @@ function Song({ song }) {
 
   function handleToglePlay() {
     dispatch({ type: "SET_SONG", payload: { song } });
-    dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
+    dispatch(
+      state.isPlaying && state.song.id === song.id
+        ? { type: "PAUSE_SONG" }
+        : { type: "PLAY_SONG" }
+    );
   }
 
   async function handleDeleteSong() {
+    setDeletedSongStyle(true);
     await deleteSong({
       variables: {
         id: song.id,
       },
     });
+
+    toast((t) => (
+      <div>
+        <Typography variant='body1' gutterBottom component='div'>
+          <b>{song.title.substr(0, 12).concat("...")}</b> successfully deleted
+          <IconButton onClick={() => toast.dismiss(t.id)}>
+            <CloseIcon fontSize='small' />
+          </IconButton>
+        </Typography>
+      </div>
+    ));
   }
 
   function handleAddOrRemoveFromQueue() {
@@ -152,6 +169,10 @@ function Song({ song }) {
         input: { ...song, __typename: "Song" },
       },
     });
+
+    // toast(`You've added song to queue`, {
+    //   icon: "👏",
+    // });
   }
 
   return (
@@ -162,8 +183,9 @@ function Song({ song }) {
           sx={styles.thumbnail}
           onClick={handleToglePlay}
         />
+
         <div style={styles.songInfo}>
-          <CardContent>
+          <CardContent sx={{ opacity: deletedSongStyle ? "0.33" : "1" }}>
             <Typography gutterBottom variant='h5' component='h2'>
               {title}
             </Typography>
@@ -171,7 +193,7 @@ function Song({ song }) {
               {artist}
             </Typography>
           </CardContent>
-          <CardActions>
+          <CardActions sx={{ opacity: deletedSongStyle ? "0.33" : "1" }}>
             <IconButton size='small' color='primary' onClick={handleToglePlay}>
               {!currentSongPlaying ? <PlayArrow /> : <PauseCircleRounded />}
             </IconButton>

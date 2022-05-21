@@ -8,6 +8,7 @@ import client from "./graphql/client";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import theme from "./theme";
+import { Toaster } from "react-hot-toast";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -15,6 +16,7 @@ root.render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <App />
+      <Toaster position='top-center' reverseOrder={false} />
     </ThemeProvider>
   </ApolloProvider>
 );

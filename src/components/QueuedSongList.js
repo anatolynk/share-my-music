@@ -3,9 +3,11 @@ import React, { useContext } from "react";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import {
   Avatar,
+  Button,
   Card,
   CardContent,
   IconButton,
+  Link,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -18,11 +20,20 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 
 import EqualizerRoundedIcon from "@mui/icons-material/EqualizerRounded";
 import MusicNoteRoundedIcon from "@mui/icons-material/MusicNoteRounded";
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import ShuffleRoundedIcon from "@mui/icons-material/ShuffleRounded";
+import CloseIcon from "@mui/icons-material/Close";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 
-import { useMutation } from "@apollo/client";
-import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutation";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  ADD_OR_REMOVE_FROM_QUEUE,
+  REMOVE_ALL_SONGS_FROM_QUEUE,
+} from "../graphql/mutation";
 import { SongContext } from "../App";
 import { style } from "@mui/system";
+import toast from "react-hot-toast";
+import { GET_QUEUED_SONGS } from "../graphql/queries";
 
 const styles = {
   avatar: {
@@ -53,17 +64,83 @@ const styles = {
   },
 };
 
-function QueuedSongList({ queue }) {
+function QueuedSongList({ queue, reactPlayerRef }) {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const { state, dispatch } = useContext(SongContext);
+
+  const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
+    onCompleted: (data) => {
+      localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
+    },
+  });
+
+  function handleAllPlay() {
+    const song = queue[0];
+    dispatch({ type: "SET_SONG", payload: { song } });
+    dispatch({ type: "PLAY_SONG" });
+    reactPlayerRef.current.seekTo(0);
+  }
+  function handleShuffle() {
+    const randomSong = Math.floor(Math.random() * queue.length);
+    let song = queue[randomSong];
+
+    if (song.id === state.song.id) {
+      song = queue[randomSong + 1];
+    }
+
+    if (!song) {
+      song = queue[0];
+    }
+    dispatch({ type: "SET_SONG", payload: { song } });
+    dispatch({ type: "PLAY_SONG" });
+    reactPlayerRef.current.seekTo(0);
+  }
+
+  function handleRemoveAllSongsFromQueue() {
+    queue.forEach((song) => {
+      addOrRemoveFromQueue({
+        variables: {
+          input: { ...song, __typename: "Song" },
+        },
+      });
+    });
+  }
 
   return (
     greaterThanMd && (
       <Card sx={{ margin: "10px 0" }}>
         <CardContent>
-          <Typography color='textPrimary' variant='button'>
-            QUEUE ({queue.length})
+          <Typography variant='h5' component='h3'>
+            Queue
           </Typography>
-
+          <Button
+            disabled={!queue.length}
+            onClick={handleAllPlay}
+            variant='contained'
+            color='secondary'
+            startIcon={<PlayArrowRoundedIcon />}
+          >
+            Play All ({queue.length})
+          </Button>
+          &nbsp;&nbsp;&nbsp;
+          <Button
+            disabled={!(queue.length > 1)}
+            onClick={handleShuffle}
+            variant='outlined'
+            color='secondary'
+            startIcon={<ShuffleRoundedIcon />}
+          >
+            Shuffle
+          </Button>
+          &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+          <IconButton
+            disabled={!queue.length}
+            onClick={handleRemoveAllSongsFromQueue}
+            variant='outlined'
+            color='secondary'
+          >
+            <ClearAllIcon />
+          </IconButton>
           {queue.map((song, i) => (
             <QueuedSong key={i} song={song} />
           ))}
@@ -74,7 +151,7 @@ function QueuedSongList({ queue }) {
 }
 
 function QueuedSong({ song }) {
-  const { thumbnail, artist, title } = song;
+  const { thumbnail, artist, title, duration } = song;
 
   const { state, dispatch } = useContext(SongContext);
 
@@ -90,12 +167,30 @@ function QueuedSong({ song }) {
         input: { ...song, __typename: "Song" },
       },
     });
-    console.log(state);
+    toast((t) => (
+      <div>
+        <Typography variant='body1' gutterBottom component='div'>
+          <b>{song.artist.substr(0, 10)}</b> removed from queue
+          <IconButton onClick={() => toast.dismiss(t.id)}>
+            <CloseIcon fontSize='small' />
+          </IconButton>
+        </Typography>
+      </div>
+    ));
   }
 
   function handleToglePlay() {
     dispatch({ type: "SET_SONG", payload: { song } });
-    dispatch({ type: "PLAY_SONG" });
+    dispatch(
+      state.isPlaying && state.song.id === song.id
+        ? { type: "PAUSE_SONG" }
+        : { type: "PLAY_SONG" }
+    );
+  }
+
+  // Convert seconds timestamp into comfort format hh:mm:ss
+  function formatDuratiom(seconds) {
+    return new Date(seconds * 1000).toISOString().substr(11, 8);
   }
 
   return (
@@ -111,8 +206,25 @@ function QueuedSong({ song }) {
             src={thumbnail}
           />
         </ListItemAvatar>
-        <ListItemText primary={title} secondary={artist} />
+        <ListItemText
+          primary={
+            title.length > 50
+              ? title.substr(0, 42).concat("...")
+              : title.substr(0, 45)
+          }
+          secondary={artist}
+        />
+        {/* <ListItemText secondary={formatDuratiom(duration)} /> */}
+        <Typography
+          variant='subtitle2'
+          component='p'
+          color='textPrimary'
+          sx={{ paddingTop: "12px", paddingRight: "7px" }}
+        >
+          {formatDuratiom(duration)}
+        </Typography>
         <IconButton onClick={handleAddOrRemoveFromQueue}>
+          <br />
           <RemoveCircleIcon color='action' />
         </IconButton>
       </ListItem>

@@ -5,6 +5,7 @@ import {
   SkipPreviousRounded,
 } from "@mui/icons-material";
 import {
+  Avatar,
   Card,
   CardContent,
   CardMedia,
@@ -21,7 +22,8 @@ import { SongContext } from "../App";
 import { useQuery } from "@apollo/client";
 import { GET_QUEUED_SONGS } from "../graphql/queries";
 
-import ReactPlayer from "react-player";
+// import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/lazy";
 
 const styles = {
   container: {
@@ -37,7 +39,7 @@ const styles = {
     flex: "1 0 auto",
   },
   thumbnail: {
-    width: 150,
+    width: "200px",
   },
   controls: {
     display: "flex",
@@ -46,8 +48,8 @@ const styles = {
     paddingRight: theme.spacing(1),
   },
   playIcon: {
-    height: 38,
-    width: 38,
+    height: 50,
+    width: 50,
   },
 };
 
@@ -186,7 +188,7 @@ function SongPlayer() {
         />
         <CardMedia sx={styles.thumbnail} image={state.song.thumbnail} />
       </Card>
-      <QueuedSongList queue={data.queue} />
+      <QueuedSongList queue={data.queue} reactPlayerRef={reactPlayerRef} />
     </div>
   );
 }

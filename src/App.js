@@ -47,12 +47,12 @@ function App() {
               ? {
                   position: "fixed",
                   width: "100%",
-                  right: 0,
+                  right: 20,
                   top: 70,
                 }
               : {
                   position: "fixed",
-                  width: "100%",
+                  width: "97%",
                   left: 0,
                   bottom: 0,
                 }
