@@ -9,7 +9,6 @@ import {
   DialogTitle,
   InputAdornment,
   TextField,
-  Typography,
 } from "@mui/material";
 
 import React, { useState, useEffect } from "react";
@@ -101,7 +100,8 @@ function AddSong() {
 
   function getYoutubeInfo(player) {
     const duration = player.getDuration();
-    const { title, video_id, author } = player.getVideoData();
+    const { title, video_id } = player.getVideoData();
+    // Get first word from title as Artist Name from youtube video
     const newArtist = title.split(" ")[0] ? title.split(" ")[0] : "Artist Name";
 
     const thumbnail = `https://img.youtube.com/vi/${video_id}/0.jpg`;
@@ -232,7 +232,7 @@ function AddSong() {
         onChange={(event) => setUrl(event.target.value)}
         value={url}
         sx={styles.urlInput}
-        placeholder='Add Music URL - youtube or soundcloud'
+        placeholder='Add Music URL - YouTube or SoundCloud'
         fullWidth
         margin='normal'
         type='url'

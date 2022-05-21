@@ -1,22 +1,15 @@
-import { qgl, useMutation, useQuery } from "@apollo/client";
-import {
-  LibraryAddRounded,
-  PlayArrow,
-  PauseCircleRounded,
-} from "@mui/icons-material";
+import { useMutation, useQuery } from "@apollo/client";
+import { PlayArrow, PauseCircleRounded } from "@mui/icons-material";
 
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 
-import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import CloseIcon from "@mui/icons-material/Close";
 
 import {
   Alert,
-  Breadcrumbs,
-  Button,
   Card,
   CardActions,
   CardContent,
@@ -24,13 +17,8 @@ import {
   CircularProgress,
   IconButton,
   Link,
-  Tab,
-  Tabs,
   Typography,
 } from "@mui/material";
-
-import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
-import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
 
 import React, { useContext, useState, useEffect } from "react";
 
@@ -64,13 +52,6 @@ function SongList() {
 
   if (error) return <Alert severity='error'>Error fetching songs</Alert>;
 
-  // const queueList = JSON.parse(localStorage.getItem("queue"));
-
-  // // Find song.id inside queue array
-  // const isAddedToQueue = (s, q) => {
-  //   return q.filter((e) => e.id === s.id).length > 0;
-  // };
-
   return (
     <div>
       <center>
@@ -87,16 +68,6 @@ function SongList() {
               >
                 Find any song from&nbsp;
                 <Link
-                  href='https://soundcloud.com/digitalstreams/sets/drivehomemixtape'
-                  underline='hover'
-                  target='_blank'
-                  rel='noreferrer'
-                  color='secondary'
-                >
-                  SoundCloud
-                </Link>
-                &nbsp;or&nbsp;
-                <Link
                   href='https://www.youtube.com/c/TSGMusic/videos'
                   underline='hover'
                   target='_blank'
@@ -104,6 +75,16 @@ function SongList() {
                   color='secondary'
                 >
                   YouTube
+                </Link>
+                &nbsp;or&nbsp;
+                <Link
+                  href='https://soundcloud.com/digitalstreams/sets/drivehomemixtape'
+                  underline='hover'
+                  target='_blank'
+                  rel='noreferrer'
+                  color='secondary'
+                >
+                  SoundCloud
                 </Link>
                 , copy and paste URL link here.
               </Alert>
