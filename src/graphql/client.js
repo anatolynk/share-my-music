@@ -1,9 +1,9 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 import { GET_QUEUED_SONGS } from "./queries";
-
+console.log(process.env);
 const client = new ApolloClient({
-  uri: "https://apollo-sharemymusic.hasura.app/v1/graphql/",
+  uri: process.env.REACT_APP_API_URL,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -70,8 +70,7 @@ const client = new ApolloClient({
 
   headers: {
     "content-type": "application/json",
-    "x-hasura-admin-secret":
-      "aGH7UI2vb5D6PrtbJSnkyxC3P1W2L5o59lVMRiQS4vIMEy4kVn0CRniij3q8Ct1Y",
+    "x-hasura-admin-secret": process.env.REACT_APP_API_KEY,
   },
 });
 
