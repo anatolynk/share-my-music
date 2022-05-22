@@ -8,7 +8,7 @@ function Header() {
       <Toolbar>
         <Typography variant='body2' component='p'>
           Project: React, Context API, Apollo GraphQL, ReactPlayer, Material UI
-          - Anatoly Nikulyak, contact: anatoly.nk@gmail.com
+          - Anatoly Nikulyak, contact: https://github.com/anatolynk
         </Typography>
       </Toolbar>
     </AppBar>
