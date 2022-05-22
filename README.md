@@ -1,6 +1,6 @@
 # My Music — Playlist Player - Anatoly
 
-This project was made by usimg: React, Context API, Apollo GraphQL, ReactPlayer, Material UI
+This project was made by using: React, Context API, Apollo GraphQL, ReactPlayer, Material UI
 
 ## How project works
 
