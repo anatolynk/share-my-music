@@ -1,7 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 import { GET_QUEUED_SONGS } from "./queries";
-console.log(process.env);
 const client = new ApolloClient({
   uri: process.env.REACT_APP_API_URL,
   cache: new InMemoryCache({
