@@ -96,6 +96,13 @@ function QueuedSongList({ queue, reactPlayerRef }) {
     reactPlayerRef.current.seekTo(0);
   }
 
+  function shuffleSongs(items) {
+    return items
+      .map((item) => ({ sort: Math.random(), value: item }))
+      .sort((item1, item2) => (item1.sort < item2.sort ? -1 : 1))
+      .map((a) => a.value);
+  }
+
   function handleRemoveAllSongsFromQueue() {
     queue.forEach((song) => {
       addOrRemoveFromQueue({
@@ -117,6 +124,28 @@ function QueuedSongList({ queue, reactPlayerRef }) {
     ));
   }
 
+  function handleShuffleNew() {
+    const shuffleQueue = shuffleSongs(queue);
+
+    // remove all songs from queue
+    queue.forEach((song) => {
+      addOrRemoveFromQueue({
+        variables: {
+          input: { ...song, __typename: "Song" },
+        },
+      });
+    });
+
+    // add shuffle songs to queue
+    shuffleQueue.forEach((song) => {
+      addOrRemoveFromQueue({
+        variables: {
+          input: { ...song, __typename: "Song" },
+        },
+      });
+    });
+  }
+
   return (
     greaterThanMd && (
       <Card sx={{ margin: "10px 0" }}>
@@ -136,7 +165,7 @@ function QueuedSongList({ queue, reactPlayerRef }) {
           &nbsp;&nbsp;&nbsp;
           <Button
             disabled={!(queue.length > 1)}
-            onClick={handleShuffle}
+            onClick={handleShuffleNew}
             variant='outlined'
             color='secondary'
             startIcon={<ShuffleRoundedIcon />}
